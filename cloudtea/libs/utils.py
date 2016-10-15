@@ -23,7 +23,7 @@ class hasher(object):
         return hash == hash2
 
 def make_password(raw_passwd):
-	return hasher().encode(raw_passwd)
+    return hasher().encode(raw_passwd)
 
 def check_password(encoded, passwd):
-	return hasher().verify(encoded,  password)
+    return hasher().verify(encoded,  password)
