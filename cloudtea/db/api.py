@@ -11,7 +11,6 @@ def get_user(username):
     	user["id"] = query.value(0)
     	user["name"] = query.value(1)
     	user["role"] = query.value(2)
-    	print user
     	return user
     return None
 

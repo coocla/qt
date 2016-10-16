@@ -4,6 +4,7 @@ import qtawesome as qta
 from PySide.QtGui import *
 
 from cloudtea.models import desktop
+from cloudtea.views import users
 
 class MainWindow(QMainWindow):
     def __init__(self, context=None):
@@ -11,19 +12,22 @@ class MainWindow(QMainWindow):
         self.context = context
         self.initUI()
 
-        widget = QWidget()
-        self.setCentralWidget(widget)
-
-        hbox = QVBoxLayout()
-        hbox.addWidget(self.initWidget())
-
-        self.centralWidget().setLayout(hbox)
-
     def initUI(self):
         self.initMenu()
         self.initStatusBar()
         self.initToolBar()
         self.resizeWindow()
+
+        widget = QWidget()
+        self.setCentralWidget(widget)
+        self.hbox = QVBoxLayout()
+        self.btn_box = QHBoxLayout()
+
+        self.hbox.addLayout(self.btn_box)
+        self.initWidget()
+        self.initFunBtnSet()
+
+        self.centralWidget().setLayout(self.hbox)
 
     def initMenu(self):
         file_action = QAction(QIcon(), u'打开文件', self)
@@ -68,11 +72,40 @@ class MainWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def initWidget(self):
-        ds = QTableView()
-        ds.setModel(desktop.roomModel())
-        ds.setColumnHidden(0, True)
-        ds.setEditTriggers(QAbstractItemView.NoEditTriggers) #不允许编辑
-        ds.setSortingEnabled(True)    #开启排序
-        ds.resizeColumnsToContents()  #列宽自适应内容
-        ds.horizontalHeader().setStretchLastSection(True)  #最后一列充满窗口
-        return ds
+        table = QTableView()
+        mapped = [
+            {"name":"name", "display":u"姓名"},
+            {"name":"username","display":u"账号"},
+            {"name":"sex","display":u"性别"},
+            {"name":"age","display":u"年龄"},
+            {"name":"phone","display":u"联系方式"},
+            {"name":"created_at","display":u"添加时间"}
+        ]
+        hiden = ('id', 'password', 'role')
+        model = desktop.RoomModel(mapped, hiden)
+        table.setModel(model)
+        #table.setColumnHidden(0, True)
+        header = table.horizontalHeader()
+        header.setMovable(True)
+        for index, field in enumerate(mapped):
+            if index+1 == len(mapped):
+                continue
+            header.swapSections(model.fieldIndex(field['name']), index)
+
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers) #不允许编辑
+        table.setSortingEnabled(True)    #开启排序
+        table.resizeColumnsToContents()  #列宽自适应内容
+        header.setStretchLastSection(True)  #最后一列充满窗口
+        self.hbox.addWidget(table)
+
+    def initFunBtnSet(self):
+        btn_newuser = QPushButton(u'新增用户', self)
+        btn_newsearch = QPushButton(u'搜索', self)
+        btn_newuser.clicked.connect(self._on_userbtn_clicked)
+        self.dialog = users.NewUserDialog()
+        self.btn_box.addWidget(btn_newuser)
+        self.btn_box.addWidget(btn_newsearch)
+        self.btn_box.addStretch()
+
+    def _on_userbtn_clicked(self):
+        self.dialog.exec_()
