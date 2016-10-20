@@ -6,6 +6,7 @@ from PySide.QtGui import *
 from cloudtea.models import desktop
 from cloudtea.views import users
 
+
 class MainWindow(QMainWindow):
     def __init__(self, context=None):
         super(MainWindow, self).__init__()
@@ -96,6 +97,7 @@ class MainWindow(QMainWindow):
         table.setSortingEnabled(True)    #开启排序
         table.resizeColumnsToContents()  #列宽自适应内容
         header.setStretchLastSection(True)  #最后一列充满窗口
+        header.setSectionResizeMode(QHeaderView.Stretch)
         self.hbox.addWidget(table)
 
     def initFunBtnSet(self):
