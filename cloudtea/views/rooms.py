@@ -8,18 +8,13 @@ try:
 except:
     _fromUtf8 = lambda s:s
 
-class RoomView(QWidget):
-    def __init__(self,):
-        super(RoomView, self).__init__()
-        self.box = QGridLayout()
-        self.initUI()
 
-    def initUI(self):
-        model = QSqlQueryModel()
-        model.setQuery('select * from rooms')
-        for index in range(0, model.rowCount()):
-            name = model.record(index).value('name')
-            inused = model.record(index).value('inused')
 
+class RoomBtn(QPushButton):
+    def __init__(self):
+        super(RoomBtn, self).__init__()
+
+    def set_theme_style(self):
+        pass
 
 

@@ -1,18 +1,14 @@
 #coding:utf-8
-from cloudtea.db import utils
+from cloudtea.db.models import *
+from cloudtea.db.utils import get_engine,  get_session, query
 
-def get_user(username):
-    query = utils.db_engine()
-    if '&' in username or ';' in username:
-    	return None
-    query.exec_('select id, name, role from users where username="%(username)s"' % locals())
-    if query.first():
-    	user = {}
-    	user["id"] = query.value(0)
-    	user["name"] = query.value(1)
-    	user["role"] = query.value(2)
-    	return user
-    return None
+
+def get_user(username, session=None):
+    return query(Users).filter_by(username=username).first()
+
+def list_room():
+    return query(Rooms).all()
+    
 
 if __name__ == '__main__':
 	get_user('admin')

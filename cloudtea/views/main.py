@@ -7,32 +7,36 @@ from cloudtea.views import users, rooms, widgets
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, context=None):
+    def __init__(self, user=None):
         super(MainWindow, self).__init__()
-        self.context = context
+        self.user = user
         self.initUI()
 
     def initUI(self):
-        self.initMenu()
-        self.initStatusBar()
-        self.initToolBar()
-        self.resizeWindow()
+        self.initMenu()        #初始化菜单栏
+        self.initStatusBar()   #初始化状态栏
+        self.initToolBar()     #初始化工具栏
+        self.initSideBar()     #初始化侧边栏
+        self.initMainWindow()  #初始化主窗口
+        self.resizeWindow()    #调整初始位置
 
-        widget = QWidget()
-        self.setCentralWidget(widget)
-        self.hbox = QVBoxLayout()
-        self.btn_box = QHBoxLayout()
 
-        self.hbox.addLayout(self.btn_box)
-        self.initWidget()
 
-        self.initFunBtnSet()
+        # widget = QWidget()
+        # self.setCentralWidget(widget)
+        # self.hbox = QVBoxLayout()
+        # self.btn_box = QHBoxLayout()
 
-        self.centralWidget().setLayout(self.hbox)
+        # self.hbox.addLayout(self.btn_box)
+        # #self.initWidget()
+        # self.initRoom()
+
+        # self.initFunBtnSet()
+
+        # self.centralWidget().setLayout(self.hbox)
 
     def initMenu(self):
         file_action = QAction(QIcon(), u'打开文件', self)
-
         menubar = self.menuBar()
         file_menu = menubar.addMenu(u'文件')
         user_menu = menubar.addMenu(u'店员管理')
@@ -42,7 +46,6 @@ class MainWindow(QMainWindow):
         data_graph = menubar.addMenu(u'报表分析')
         sys_menu = menubar.addMenu(u'系统设置')
         help_menu = menubar.addMenu(u'关于')
-
         file_menu.addAction(file_action)
 
     def initStatusBar(self):
@@ -64,6 +67,9 @@ class MainWindow(QMainWindow):
         self.vip_create.addAction(vip_create)
         self.vip_recharge.addAction(vip_recharge)
 
+    def initSideBar(self):
+        
+
     def resizeWindow(self):
         self.setGeometry(300, 300, 1024, 600)
         self.setWindowTitle(u'浮云茶舍')
@@ -71,6 +77,15 @@ class MainWindow(QMainWindow):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    def initRoom(self):
+        _data = rooms.roomlist()
+        grid = QGridLayout()
+        for r in _data:
+            r = rooms.RoomBtn()
+            grid.addWidget(r, )
+
+
 
     def initWidget(self):
         table = QTableView()
@@ -86,7 +101,7 @@ class MainWindow(QMainWindow):
 
         model = widgets.BaseTableView('users', mapped, hiden)
         table.setModel(model)
-        table.setItemDelegate(users.UserDelegate())
+        #table.setItemDelegate(users.UserDelegate())
         header = table.horizontalHeader()
         header.setMovable(True)
         for index, field in enumerate(mapped):
@@ -98,7 +113,7 @@ class MainWindow(QMainWindow):
         table.setSortingEnabled(True)    #开启排序
         table.resizeColumnsToContents()  #列宽自适应内容
         header.setStretchLastSection(True)  #最后一列充满窗口
-        header.setSectionResizeMode(QHeaderView.Stretch)
+        #header.setSectionResizeMode(QHeaderView.Stretch)
         self.hbox.addWidget(table)
 
     def initFunBtnSet(self):

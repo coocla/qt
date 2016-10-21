@@ -2,8 +2,7 @@
 from PySide import QtCore
 from PySide.QtGui import *
 
-from cloudtea.db import api
-from cloudtea.libs import utils
+from cloudtea.db import api, utils
 from cloudtea.views import widgets
 
 try:
@@ -56,8 +55,8 @@ class LoginWindow(QDialog):
         username = unicode(self.username.text())
         password = unicode(self.password.text())
         self.user = api.get_user(username)
-        if 1:
-        #if self.user and utils.check_password(self.user.password, password):
+        #if 1:
+        if self.user and utils.check_password(password, self.user.password):
             self.accept()
         else:
             showMsg()
@@ -71,7 +70,7 @@ class LoginWindow(QDialog):
 
 class showMsg(widgets.BaseWidget):
     def __init__(self):
-        super(Exp, self).__init__()
+        super(showMsg, self).__init__()
         self.initUI()
         
     def initUI(self):
