@@ -3,8 +3,7 @@ import qtawesome as qta
 
 from PySide.QtGui import *
 
-from cloudtea.models import desktop
-from cloudtea.views import users
+from cloudtea.views import users, rooms, widgets
 
 class MainWindow(QMainWindow):
     def __init__(self, context=None):
@@ -25,6 +24,7 @@ class MainWindow(QMainWindow):
 
         self.hbox.addLayout(self.btn_box)
         self.initWidget()
+
         self.initFunBtnSet()
 
         self.centralWidget().setLayout(self.hbox)
@@ -82,9 +82,10 @@ class MainWindow(QMainWindow):
             {"name":"created_at","display":u"添加时间"}
         ]
         hiden = ('id', 'password', 'role')
-        model = desktop.RoomModel(mapped, hiden)
+
+        model = widgets.BaseTableView('users', mapped, hiden)
         table.setModel(model)
-        #table.setColumnHidden(0, True)
+        table.setItemDelegate(users.UserDelegate())
         header = table.horizontalHeader()
         header.setMovable(True)
         for index, field in enumerate(mapped):

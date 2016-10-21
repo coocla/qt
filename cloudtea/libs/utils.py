@@ -1,7 +1,15 @@
 #coding:utf-8
 import random
 import hashlib
+import datetime
 
+
+def now():
+    return datetime.datetime.now()
+
+def ordernum():
+    return "P%s" % now().strftime('%Y%m%d%H%M%S')
+    
 def get_random_string(length=8, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
     return ''.join(random.choice(allowed_chars) for i in range(length))
 

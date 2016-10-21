@@ -7,7 +7,7 @@ from PySide.QtCore import *
 
 from cloudtea.views import login, main
 
-QTextCodec.setCodecForTr(QTextCodec.codecForName("utf8"))
+QTextCodec.setCodecForTr(QTextCodec.codecForName("utf-8"))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

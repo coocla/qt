@@ -38,6 +38,7 @@ class LoginWindow(QDialog):
         self.username.setGeometry(QtCore.QRect(200, 70, 221, 31))
         self.username.setObjectName(_fromUtf8("username"))
         self.password = QLineEdit(self.groupBox)
+        self.password.setEchoMode(QLineEdit.Password)
         self.password.setGeometry(QtCore.QRect(200, 120, 221, 31))
         self.password.setObjectName(_fromUtf8("password"))
         self.login_btn = QPushButton(self.groupBox)
