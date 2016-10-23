@@ -1,7 +1,7 @@
 #coding:utf-8
-from PySide.QtGui import *
-from PySide.QtCore import *
-from PySide.QtSql import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtSql import *
 
 class BaseWidget(QWidget):
     def __init__(self):
@@ -135,8 +135,6 @@ class Pagination(QWidget):
 
     def QueryRecord(self, index):
         offset = index * self.SinglePageNum
-        print offset, self.SinglePageNum
         self.model.setFilter('limit %d offset %d' % (self.SinglePageNum, offset))
         self.model.select()
-        print self.model.lastError()
         #self.model.setQuery('select * from %s limit %d,%d' % (self.table, offset, self.SinglePageNum))

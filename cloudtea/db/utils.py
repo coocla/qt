@@ -3,7 +3,7 @@ import hashlib
 import random
 import sqlalchemy
 import sqlalchemy.orm
-from PySide import QtSql, QtGui
+from PyQt5 import QtSql, QtGui
 
 from cloudtea import setting as opt
 
@@ -35,7 +35,7 @@ def get_engine():
             "echo":False, 
             "convert_unicode":True
         }
-        sql_connection = 'mysql://%s:%s@%s:%s/%s?charset=utf8' % (opt.db_user, opt.db_password, opt.db_host, opt.db_port, opt.db_name)
+        sql_connection = 'mysql+pymysql://%s:%s@%s:%s/%s?charset=utf8' % (opt.db_user, opt.db_password, opt.db_host, opt.db_port, opt.db_name)
         _ENGINE = sqlalchemy.create_engine(sql_connection, **engine_args)
         _ENGINE.connect()
     return _ENGINE
@@ -68,10 +68,14 @@ class hasher(object):
     def encode(self, password):
         salt = self.salt()
         hash = self.make_hash(salt, password)
+        print(hash)
         return '%s$%s' % (salt, hash)
         
     def make_hash(self, salt, password):
-        return hashlib.md5('%s$%s' % (salt, password)).hexdigest()
+        m = hashlib.md5()
+        salt = salt.encode('utf-8')
+        m.update(salt+password)
+        return m.hexdigest()
         
     def salt(self):
         return get_random_string()
@@ -79,6 +83,7 @@ class hasher(object):
     def verify(self, password,  encoded):
         salt, hash = encoded.split('$')
         hash2 = self.make_hash(salt, password)
+        print(hash, hash2)
         return hash == hash2
 
 def make_password(password):

@@ -1,11 +1,15 @@
 #coding:utf-8
 import os
 import random
+import logging
 import configparser
 
-from PySide.QtGui import QWidget, QColor
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QColor
 
+logger = logging.getLogger(__name__)
 THEMES_DIR = 'themes'
+
 class ThemesManager(object):
     def __init__(self, app):
         self._app = app
@@ -52,6 +56,7 @@ class ThemesManager(object):
 
     def set_theme(self, theme_name):
         '''set current theme'''
+        logger.info('set theme to %s' % theme_name)
         self.current_theme = Theme(theme_name)
 
 

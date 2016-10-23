@@ -1,7 +1,7 @@
 #coding:utf-8
 import qtawesome as qta
 
-from PySide.QtGui import *
+from PyQt5.QtGui import *
 
 from cloudtea.views import users, rooms, widgets
 

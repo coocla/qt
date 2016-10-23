@@ -1,7 +1,7 @@
 #coding:utf-8
-from PySide import QtCore
-from PySide.QtGui import *
-from PySide.QtSql import *
+from PyQt5 import QtCore
+from PyQt5.QtGui import *
+from PyQt5.QtSql import *
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8

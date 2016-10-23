@@ -1,6 +1,6 @@
 #coding:utf-8
-from PySide.QtCore import Signal, Qt
-from PySide.QtGui import QHBoxLayout, QVBoxLayout, QSizePolicy
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QSizePolicy
 
 from cloudtea.widgets import base
 
@@ -16,11 +16,12 @@ class Input(base.TLineEdit):
 
 
 class CreateButton(base.TLabel):
-    clicked = Signal()
+    clicked = pyqtSignal()
 
     def __init__(self, app, text=None, parent=None):
         super(CreateButton, self).__init__()
         self._app = app
+        print(self._app)
         self.setText(u'新增')
         self.setToolTip(u'新增房间')
         self.setObjectName('room_create_btn')
@@ -53,7 +54,7 @@ class CreateDialog(base.TDialog):
         self.room_vip_price = Input(self)
         self.room_common_price = Input(self)
         self.room_capacity = Input(self)
-        self.ok_btn = base.TButton(self, u'创建')
+        self.ok_btn = base.TButton(u'创建', self)
         self._layout = QVBoxLayout(self)
 
         self.room_name.setPlaceholderText(u'房间名')
@@ -61,7 +62,7 @@ class CreateDialog(base.TDialog):
         self.room_common_price.setPlaceholderText(u'普通客户房费')
         self.room_capacity.setPlaceholderText(u'房间可容纳人数')
 
-        self.setObjectName('create_room_dialog')
+        self.setObjectName('login_dialog')
         self.set_theme_style()
         self.setup_ui()
 
@@ -82,7 +83,7 @@ class CreateDialog(base.TDialog):
         self._layout.addWidget(self.ok_btn)
 
     def verify_name(self, text):
-        print "Current room name is %s" % text
+        print('verify_name is %s' % text)
 
 
 
@@ -94,16 +95,25 @@ class UI(object):
         self.create_dialog = CreateDialog(self._app, self._app)
         #创建按钮
         self.create_btn = CreateButton(self._app)
-        self.menu_container = base.TFrame()
+        # self.menu_container = base.TFrame()
 
-        self.room_manage = base.TGroupItem(self._app, u'房间管理')
-        self.room_manage.set_img_text('RR')
-        self._menu_layout = QHBoxLayout(self.menu_container)
+        self.room_item = base.TGroupItem(self._app, u'房间管理')
+        self.room_item.set_img_text('>')
+        self.bind_signal()
+        # self._menu_layout = QHBoxLayout(self.menu_container)
 
         self.setup_ui()
 
     def setup_ui(self):
-        self._menu_layout.setContentsMargins(0, 0, 0, 0)
-        self._menu_layout.setSpacing(0)
-        self._menu_layout.addWidget(self.create_btn)
-        self._app.ui.central_panel.left_panel.sidebar_panel.add_item(self.room_manage)
+        # self._menu_layout.setContentsMargins(0, 0, 0, 0)
+        # self._menu_layout.setSpacing(0)
+        # self._menu_layout.addWidget(self.create_btn)
+        self.create_btn.setFixedSize(30, 30)
+        top_panel = self._app.ui.central_panel.top_panel
+        side_panel = self._app.ui.side_panel.left_panel
+
+        top_panel.add_item(self.create_btn)
+        side_panel.sidebar_panel.add_item(self.room_item)
+
+    def bind_signal(self):
+        self.room_item.clicked.connect(self._app.switch_desktop)

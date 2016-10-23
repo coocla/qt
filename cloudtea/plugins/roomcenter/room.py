@@ -1,5 +1,5 @@
 #coding:utf-8
-from PySide.QtGui import QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from .ui import UI
 from cloudtea.widgets import base

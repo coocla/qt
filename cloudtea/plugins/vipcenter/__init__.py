@@ -5,7 +5,7 @@ __alias__ = u'会员中心'
 
 
 def enable(app):
-    pass
+    v = VIP(app)
 
 def disable(app):
     pass

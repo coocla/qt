@@ -22,15 +22,14 @@ class PluginsManager(object):
     def load_plugins(self):
         PLUGINS_DIR = 'plugins'
         modules = [p for p in os.listdir(PLUGINS_DIR) if os.path.isdir(os.path.join(PLUGINS_DIR, p))]
-        print modules
-        for module_name in modules:
+        for plugin_name in modules:
             try:
-                module_name = '%(PLUGINS_DIR)s.%(module_name)s' % locals()
-                module = importlib.import_module(module_name)
-                plugin_name = module.__alias__
-                if module.check_policy(self.user):
-                    self._plugins[plugin_name] = module
-                    module.enable(self._app)
-                    logger.info('detect plugin %s' % module_name)
-            except Exception,e:
-                logger.error('detect a bad plugin %s, traceback:\n%s' % (module_name, e), exc_info=True)
+                plugin_name = '%(PLUGINS_DIR)s.%(plugin_name)s' % locals()
+                plugin = importlib.import_module(plugin_name)
+                # plugin_name = module.__alias__
+                if plugin.check_policy(self.user):
+                    # self._plugins[plugin_name] = module
+                    plugin.enable(self._app)
+                    logger.info('detect plugin %s' % plugin_name)
+            except Exception as e:
+                logger.error('detect a bad plugin %s, traceback:\n%s' % (plugin_name, e), exc_info=True)

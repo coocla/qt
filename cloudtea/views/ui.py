@@ -1,7 +1,8 @@
 #coding:utf-8 
-from PySide.QtGui import QVBoxLayout, QHBoxLayout
-from PySide.QtCore import Qt
-from cloudtea.widgets import base
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
+from PyQt5.QtCore import Qt
+
+from cloudtea.widgets import base, components, status
 
 
 class SideBarPanel(base.TFrame):
@@ -10,18 +11,30 @@ class SideBarPanel(base.TFrame):
         self._app = app
 
         self.header = base.TGroupHeader(self._app, u'管理中心')
+        self.current_side_item = base.TGroupItem(self._app, u'桌面')
+        self.current_side_item.set_img_text('❂')
         self._layout = QVBoxLayout(self)
-        self.setObjectName('func_list_panel')
+
+        self.setObjectName('lp_library_panel')
         self.set_theme_style()
         self.setup_ui()
 
     def set_theme_style(self):
-        pass
+        theme = self._app.theme_manager.current_theme
+        style_str = ''' 
+            #{0} {{ 
+                background: transparent; 
+            }} 
+         '''.format(self.objectName(), 
+            theme.color3.name())
+        self.setStyleSheet(style_str) 
 
     def setup_ui(self):
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._layout.setSpacing(0)
+        self._layout.addSpacing(8)
         self._layout.addWidget(self.header)
+        self._layout.addWidget(self.current_side_item)
 
     def add_item(self, item):
         self._layout.addWidget(item)
@@ -33,18 +46,34 @@ class TopPanel(base.TFrame):
         self._app = app
 
         self._layout = QHBoxLayout(self)
-        self.setLayout(self._layout)
+        self.setObjectName('pc_panel')
         self.set_theme_style()
         self.setup_ui()
 
     def set_theme_style(self):
-        pass
+        theme = self._app.theme_manager.current_theme 
+        style_str = ''' 
+            #{0} {{ 
+                background: transparent; 
+                color: {1}; 
+                border-bottom: 3px inset {3}; 
+            }} 
+        '''.format(self.objectName(), 
+                   theme.foreground.name(), 
+                   theme.color0_light.name(), 
+                   theme.color0_light.name()) 
+        self.setStyleSheet(style_str) 
+
 
     def setup_ui(self):
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._layout.setSpacing(0)
         self.setFixedHeight(50)
         self._layout.addSpacing(5)
+
+    def add_item(self, widget):
+        self._layout.addWidget(widget)
+        self._layout.addStretch(1)
 
 
 
@@ -96,10 +125,10 @@ class LeftPanel_Container(base.TScrollArea):
         self.setWidgetResizable(True)
 
         self.setObjectName('c_left_panel_container')
-        self.setMinimumWidth(180)
-        self.setMaximumWidth(220)
-
         self.set_theme_style()
+        self.setMinimumWidth(80)
+        self.setMaximumWidth(160)
+
         self.setup_ui()
 
     def set_theme_style(self):
@@ -193,12 +222,12 @@ class CentralPanel(base.TFrame):
         super(CentralPanel, self).__init__(parent)
         self._app = app
 
-        self.left_panel_container = LeftPanel_Container(self._app, self)
+        self.top_panel = TopPanel(self._app, self)
         self.right_panel_container = RightPanel_Container(self._app, self)
-        self.left_panel = self.left_panel_container.left_panel
+        #self.left_panel = self.left_panel_container.left_panel
         self.right_panel = self.right_panel_container.right_panel
 
-        self._layout = QHBoxLayout(self)
+        self._layout = QVBoxLayout(self)
         self.set_theme_style()
         self.setup_ui()
 
@@ -214,21 +243,62 @@ class CentralPanel(base.TFrame):
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._layout.setSpacing(0)
 
-        self._layout.addWidget(self.left_panel_container)
+        self._layout.addWidget(self.top_panel)
         self._layout.addWidget(self.right_panel_container)
+
+class StatusPanel(base.TFrame):
+    def __init__(self, app, parent=None):
+        super(StatusPanel, self).__init__(parent)
+        self._app = app
+        self._layout = QHBoxLayout(self)
+
+        self.network_status_label = status.NetworkStatus(self._app)
+        self.message_label = status.MessageLabel(self._app)
+        self.theme_switch_btn = status.ThemeComboBox(self._app, self)
+
+        self.setup_ui()
+        self.setObjectName('status_panel')
+        self.set_theme_style()
+
+    def setup_ui(self):
+        self._layout.setContentsMargins(0,0,0,0)
+        self._layout.setSpacing(0)
+        self.setFixedHeight(18)
+
+        self._layout.addWidget(self.network_status_label)
+        self._layout.addStretch(0)
+        self._layout.addWidget(self.message_label)
+        self._layout.addStretch(0)
+        self._layout.addWidget(self.theme_switch_btn)
+
+    def set_theme_style(self):
+        theme = self._app.theme_manager.current_theme
+        style_str = '''
+            #{0} {{
+                background: {1};
+            }}
+        '''.format(self.objectName(),
+                theme.color0.name())
+        self.setStyleSheet(style_str)
 
 
 class UI(object):
     def __init__(self, app):
+        self._box = QHBoxLayout()
         self._layout = QVBoxLayout(app)
-        self.top_panel = TopPanel(app, app)
+        self.side_panel = LeftPanel_Container(app, app)
         self.central_panel = CentralPanel(app, app)
-        #self.central_panel.right_panel.set_widget()
+        self.current_desktop = components.RoomTable(app)
+        self.status_panel = StatusPanel(app, app)
         self.setup_ui()
 
     def setup_ui(self):
+        self._box.setContentsMargins(0, 0, 0, 0)
+        self._box.setSpacing(0)
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._layout.setSpacing(0)
-        self._layout.addWidget(self.top_panel)
-        self._layout.addWidget(self.central_panel)
+        self._box.addWidget(self.side_panel)
+        self._box.addWidget(self.central_panel)
+        self._layout.addLayout(self._box)
+        self._layout.addWidget(self.status_panel)
 

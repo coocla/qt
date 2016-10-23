@@ -1,9 +1,9 @@
 #coding:utf-8
 import qtawesome as qta
 
-from PySide.QtCore import Qt, Signal, QObject
-from PySide.QtGui import QFrame, QScrollArea, QHBoxLayout, QLabel, QTableWidget, \
-    QDialog, QLineEdit, QPushButton
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
+from PyQt5.QtWidgets import QFrame, QScrollArea, QHBoxLayout, QLabel, QTableWidget, \
+    QDialog, QLineEdit, QPushButton, QComboBox
 
 
 class TFrame(QFrame):
@@ -16,6 +16,13 @@ class TFrame(QFrame):
 class TLabel(QLabel):
     def __init__(self, *args, **kwargs):
         super(TLabel, self).__init__(*args, **kwargs)
+
+    def set_theme_style(self):
+        pass
+
+class TComboBox(QComboBox):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
 
     def set_theme_style(self):
         pass
@@ -71,7 +78,7 @@ class TGroupHeader(TFrame):
         self.title_label = TLabel(title, self)
         self.title_label.setIndent(8)
 
-        self.setObjectName('group_header')
+        self.setObjectName('lp_group_header')
         self.set_theme_style()
         self.setup_ui()
 
@@ -99,7 +106,7 @@ class TGroupHeader(TFrame):
         self.title_label.setText(text)
 
 class TGroupItem(TFrame):
-    clicked = Signal()
+    clicked = pyqtSignal()
 
     def __init__(self, app, name=None, parent=None):
         super(TGroupItem, self).__init__(parent)
@@ -111,12 +118,12 @@ class TGroupItem(TFrame):
         self._img_label = TLabel(self)
         self._name_label = TLabel(name, self)
 
-        self.setObjectName('group_item')
+        self.setObjectName('lp_group_item')
         self._flag_label.setObjectName('lp_groun_item_flag')
         self._flag_label.setIndent(5)
+        # self._flag_label.setText('➣')
         self._img_label.setObjectName('lp_group_item_img')
-        #icon = qta.icon('fa.anchor')
-        #self._img_label.setText(icon)
+        # self._img_label.setText('♬')
         self._name_label.setObjectName('lp_group_item_name')
 
         self.set_theme_style()
@@ -148,12 +155,33 @@ class TGroupItem(TFrame):
                    theme.color0.name())
         self.setStyleSheet(style_str)
 
+    def enterEvent(self, event): 
+        theme = self._app.theme_manager.current_theme 
+        label_hover_color = theme.color5 
+        if self.is_selected: 
+            return 
+        self._img_label.setStyleSheet( 
+            'color: {0};'.format(label_hover_color.name())) 
+        self._name_label.setStyleSheet( 
+            'color: {0};'.format(label_hover_color.name()))
+
+    def leaveEvent(self, event): 
+        theme = self._app.theme_manager.current_theme 
+        label_color = theme.random_color() 
+        if self.is_selected: 
+            return 
+        self._img_label.setStyleSheet('color: {0};'.format(label_color.name())) 
+        self._name_label.setStyleSheet('color: {0};'.format(label_color.name())) 
+
+
     def setup_ui(self):
         self._layout.setContentsMargins(0,0,0,0)
         self._layout.setSpacing(0)
         self.setFixedHeight(26)
-        self._img_label.setFixedHeight(18)
+        self._img_label.setFixedWidth(18)
+        self._flag_label.setFixedWidth(22)
 
+        self._layout.addWidget(self._flag_label)
         self._layout.addWidget(self._img_label)
         self._layout.addSpacing(2)
         self._layout.addWidget(self._name_label)
@@ -166,4 +194,28 @@ class TGroupItem(TFrame):
             self.clicked.emit()
 
     def set_selected(self):
-        print "I am selected"
+        theme = self._app.theme_manager.current_theme 
+        style_str = ''' 
+            #{0} {{ 
+                background: transparent; 
+            }} 
+            #{1} {{ 
+                color: {4}; 
+                font-size: 14px; 
+            }} 
+            #{2} {{ 
+                color: {5}; 
+                font-size: 14px; 
+            }} 
+            #{3} {{ 
+                color: {6}; 
+                font-size: 13px; 
+            }} 
+        '''.format(self.objectName(), 
+                   self._flag_label.objectName(), 
+                   self._img_label.objectName(), 
+                   self._name_label.objectName(), 
+                   theme.color5_light.name(), 
+                   theme.color6.name(), 
+                   theme.color3_light.name()) 
+        self.setStyleSheet(style_str) 

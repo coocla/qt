@@ -1,7 +1,7 @@
-#coding:utf-8
-from PySide import QtCore
-from PySide.QtGui import *
-from PySide.QtSql import *
+PyQt5#coding:utf-8
+from PyQt5 import QtCore
+from PyQt5.QtGui import *
+from PyQt5.QtSql import *
 
 from cloudtea.libs import utils
 from cloudtea.views import widgets

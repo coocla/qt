@@ -1,6 +1,6 @@
 #coding:utf-8
-from PySide import QtCore
-from PySide.QtGui import *
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import *
 
 from cloudtea.db import api, utils
 from cloudtea.views import widgets
@@ -48,14 +48,14 @@ class LoginWindow(QDialog):
         self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
 
         self.retranslateUi()
-        QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
+        self.pushButton_2.clicked.connect(self.close)
+        # QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
         self.login_btn.clicked.connect(self.login)
 
     def login(self):
-        username = unicode(self.username.text())
-        password = unicode(self.password.text())
+        username = self.username.text().encode('utf-8')
+        password = self.password.text().encode('utf-8')
         self.user = api.get_user(username)
-        #if 1:
         if self.user and utils.check_password(password, self.user.password):
             self.accept()
         else:
