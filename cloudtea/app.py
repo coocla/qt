@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon, QPainter
 from PyQt5.QtCore import QTextCodec, Qt
 
 from cloudtea import logger_config, utils
+from cloudtea.db import api
 from cloudtea.consts import DEFAULT_THEME_NAME
 from cloudtea.views import login, ui
 from cloudtea.widgets import base, status
@@ -54,14 +55,12 @@ class App(base.TFrame):
         side_panel = self.ui.side_panel.left_panel.sidebar_panel
         status_panel = self.ui.status_panel
 
-        side_panel.current_side_item.clicked.connect(self.switch_desktop)
+        side_panel.current_side_item.clicked.connect(self.show_current_desktop)
         status_panel.theme_switch_btn.signal_change_theme.connect(
             self.theme_manager.choose)
         status_panel.theme_switch_btn.clicked.connect(
             self.refresh_themes)
 
-    def switch_desktop(self):
-        print('Switch sidebar........')
 
     def _init_managers(self):
         self.plugins_manager.load_plugins()
@@ -88,7 +87,27 @@ class App(base.TFrame):
         self.ui.status_panel.network_status_label.show_progress(progress)
 
     def show_current_desktop(self):
-        # self.ui.current_desktop.set_data()
+        self.ui.central_panel.top_panel.clean()  # 重置功能菜单
+        datas = api.list_room()
+        # This is dev data
+        datas=[
+            {"name":u"风花雪月"}, 
+            {"name":u"小桥流水"},
+            {"name":u"枯藤老树"},
+            {"name":u"葵花宝典"},
+            {"name":u"九阳真经"},
+            {"name":u"六脉神剑"},
+            {"name":u"凌波微步"},
+            {"name":u"隔山打牛"},
+            {"name":u"九阴真经"},
+            {"name":u"如来神掌"},
+            {"name":u"六脉神剑"},
+            {"name":u"移花接木"},
+            {"name":u"神龙摆尾"},
+            {"name":u"二龙戏珠"},
+            {"name":u"打狗棒法"}
+        ]
+        self.ui.current_desktop.set_data(datas)
         right_panel = self.ui.central_panel.right_panel
         right_panel.set_widget(self.ui.current_desktop)
 

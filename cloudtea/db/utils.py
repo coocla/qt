@@ -68,7 +68,6 @@ class hasher(object):
     def encode(self, password):
         salt = self.salt()
         hash = self.make_hash(salt, password)
-        print(hash)
         return '%s$%s' % (salt, hash)
         
     def make_hash(self, salt, password):
@@ -83,7 +82,6 @@ class hasher(object):
     def verify(self, password,  encoded):
         salt, hash = encoded.split('$')
         hash2 = self.make_hash(salt, password)
-        print(hash, hash2)
         return hash == hash2
 
 def make_password(password):

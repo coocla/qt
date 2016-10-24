@@ -74,7 +74,6 @@ class Theme(object):
             if not os.path.exists(config_file_path):
                 config_file_path = os.path.abspath(
                     USER_THEMES_DIR + '/' + config_file + '.colorscheme')
-                print('........ %s ............' % config_file_path)
             config = self._config.read(config_file_path)
             if config:
                 return True

@@ -1,4 +1,4 @@
 configparser
-pyside
 qtawesome
+qdarkstyle
 sqlalchemy

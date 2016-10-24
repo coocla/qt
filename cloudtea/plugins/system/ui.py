@@ -6,7 +6,7 @@ class UI(object):
         self._app = app
 
 
-        self.vip_item = base.TGroupItem(self._app, u'会员管理')
+        self.vip_item = base.TGroupItem(self._app, u'系统设置')
         self.vip_item.set_img_text('>')
 
         self.bind_signal()

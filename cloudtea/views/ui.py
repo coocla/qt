@@ -1,5 +1,5 @@
 #coding:utf-8 
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QSpacerItem, QWidgetItem
 from PyQt5.QtCore import Qt
 
 from cloudtea.widgets import base, components, status
@@ -54,7 +54,7 @@ class TopPanel(base.TFrame):
         theme = self._app.theme_manager.current_theme 
         style_str = ''' 
             #{0} {{ 
-                background: transparent; 
+                background: transparent;
                 color: {1}; 
                 border-bottom: 3px inset {3}; 
             }} 
@@ -72,9 +72,21 @@ class TopPanel(base.TFrame):
         self._layout.addSpacing(5)
 
     def add_item(self, widget):
-        self._layout.addWidget(widget)
-        self._layout.addStretch(1)
+        lastIndex = self._layout.count()
+        if lastIndex:
+            item = self._layout.takeAt(lastIndex)
+            if isinstance(item, QSpacerItem):
+                self._layout.insertWidget(lastIndex, widget)
+        else:
+            self._layout.addSpacing(6)
+            self._layout.addWidget(widget)
+            self._layout.addStretch(1)
 
+    def clean(self):
+        for i in reversed(range(self._layout.count())):
+            item = self._layout.takeAt(i).widget()
+            if item:
+                item.setParent(None)
 
 
 class LeftPanel(base.TFrame):
@@ -106,10 +118,6 @@ class LeftPanel(base.TFrame):
 
         self._layout.addWidget(self.sidebar_panel)
         self._layout.addStretch(1)
-         
-        # 这是测试时用的
-        #a = base.TGroupItem(self._app, u'哈哈')
-        #self.sidebar_panel.add_item(a)
 
 class LeftPanel_Container(base.TScrollArea):
     def __init__(self, app, parent=None):
@@ -126,7 +134,7 @@ class LeftPanel_Container(base.TScrollArea):
 
         self.setObjectName('c_left_panel_container')
         self.set_theme_style()
-        self.setMinimumWidth(80)
+        self.setMinimumWidth(160)
         self.setMaximumWidth(160)
 
         self.setup_ui()
@@ -195,6 +203,7 @@ class RightPanel_Container(base.TScrollArea):
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setMinimumWidth(840)
         self.setWidgetResizable(True)
 
         self.setObjectName('c_left_panel')
@@ -288,7 +297,7 @@ class UI(object):
         self._layout = QVBoxLayout(app)
         self.side_panel = LeftPanel_Container(app, app)
         self.central_panel = CentralPanel(app, app)
-        self.current_desktop = components.RoomTable(app)
+        self.current_desktop = components.RoomDesktop(app)
         self.status_panel = StatusPanel(app, app)
         self.setup_ui()
 
