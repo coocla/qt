@@ -3,6 +3,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
 
 from cloudtea.db import api, utils
+from cloudtea.widgets import base
 from cloudtea.views import widgets
 
 try:
@@ -59,7 +60,8 @@ class LoginWindow(QDialog):
         if self.user and utils.check_password(password, self.user.password):
             self.accept()
         else:
-            showMsg()
+            box=base.Message('warning', self)
+            box.show(u'错误', u'账户或密码错误!')
             
     def retranslateUi(self):
         self.groupBox.setTitle(_translate("Dialog", "登录系统", None))
@@ -67,13 +69,3 @@ class LoginWindow(QDialog):
         self.label_2.setText(_translate("Dialog", "登录密码：", None))
         self.login_btn.setText(_translate("Dialog", "登录", None))
         self.pushButton_2.setText(_translate("Dialog", "退出", None))
-
-class showMsg(widgets.BaseWidget):
-    def __init__(self):
-        super(showMsg, self).__init__()
-        self.initUI()
-        
-    def initUI(self):
-        self.setGeometry(200, 300, 400, 400)
-        self.setWindowTitle(u'错误')
-        QMessageBox.warning(self, u'错误', u'账户或密码错误!', QMessageBox.Yes, QMessageBox.Yes)

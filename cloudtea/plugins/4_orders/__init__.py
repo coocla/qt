@@ -1,11 +1,11 @@
 #coding:utf-8
-from .sale import Sale
+from .order import Order
 
 __alias__ = u'活动配置'
 
 
 def enable(app):
-    v = Sale(app)
+    v = Order(app)
 
 def disable(app):
     pass

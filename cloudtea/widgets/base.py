@@ -1,10 +1,12 @@
 #coding:utf-8
 import qtawesome as qta
 
+from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from PyQt5.QtWidgets import QFrame, QScrollArea, QHBoxLayout, QLabel, QTableWidget, \
-    QDialog, QLineEdit, QPushButton, QComboBox
+    QDialog, QLineEdit, QPushButton, QComboBox, QWidget, QMessageBox, QDesktopWidget
 
+from cloudtea import utils
 
 class TFrame(QFrame):
     def __init__(self, parent=None):
@@ -68,6 +70,39 @@ class TTableWidget(QTableWidget):
 
     def set_theme_style(self):
         pass
+
+class TLButton(TLabel):
+    clicked = pyqtSignal()
+
+    def __init__(self, app, text=None, size=12, parent=None):
+        super(TLButton, self).__init__()
+        self._app = app
+        self.setText(text)
+        self.font_size = size
+        self.setToolTip(text)
+        self.setObjectName('label_btn')
+        self.set_theme_style()
+
+    def set_theme_style(self):
+        theme = self._app.theme_manager.current_theme
+        style_str = ''' 
+            #{0} {{
+                background: transparent;
+                color: {1};
+                font-size: {3}px;
+            }}
+            #{0}:hover {{
+                color: {2};
+            }}
+        '''.format(self.objectName(),
+                   theme.foreground.name(),
+                   theme.color4.name(),
+                   self.font_size)
+        self.setStyleSheet(style_str)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton and self.rect().contains(event.pos()):
+            self.clicked.emit()
 
 class TGroupHeader(TFrame):
     def __init__(self, app, title=None, parent=None):
@@ -219,3 +254,79 @@ class TGroupItem(TFrame):
                    theme.color6.name(), 
                    theme.color3_light.name()) 
         self.setStyleSheet(style_str) 
+
+class Message(QWidget):
+    def __init__(self, level, parent=None):
+        super(Message, self).__init__(parent)
+        self.move_center()
+        self.level=level
+
+    def move_center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+    def show(self, header, text, confirm=False):
+        if confirm:
+            win = getattr(QMessageBox, 'question')
+            return win(self, header, text, QMessageBox.Yes|QMessageBox.No, QMessageBox.No)
+        else:
+            win = getattr(QMessageBox, self.level)
+            return win(self, header, text)
+
+
+class TagCellWidget(TFrame):
+    def __init__(self, app, flag):
+        super(TagCellWidget, self).__init__()
+        self._app = app
+        self.setObjectName('tag_cell')
+        self.flag = flag
+        self.tag = TLabel('√', self)
+        self.tag.setObjectName('download_tag')
+        self.tag.setAlignment(Qt.AlignCenter)
+        self.set_theme_style()
+
+        self._layout = QHBoxLayout(self)
+        self.setup_ui()
+
+    @property
+    def download_label_style(self):
+        theme = self._app.theme_manager.current_theme
+        background = utils.set_alpha(theme.color7, 50).name(QColor.HexArgb)
+        if self.flag:
+            color = theme.color4.name()
+        else:
+            color = utils.set_alpha(theme.color7, 30).name(QColor.HexArgb)
+        style_str = '''
+            #download_tag {{
+                color: {0};
+                background: {1};
+                border-radius: 10px;
+            }}
+        '''.format(color, background)
+        return style_str
+
+    def set_theme_style(self):
+        theme = self._app.theme_manager.current_theme
+        style_str = '''
+            #{0} {{
+                background: transparent;
+            }}
+        '''.format(self.objectName())
+        style_str = style_str + self.download_label_style
+        self.setStyleSheet(style_str)
+
+    def set_download_tag(self, flag):
+        self.flag = flag
+        self.set_theme_style()
+
+    def setup_ui(self):
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._layout.setSpacing(0)
+
+        self._layout.addSpacing(10)
+        self._layout.addWidget(self.tag)
+        self._layout.addSpacing(10)
+        self._layout.addStretch(1)
+        self.tag.setFixedSize(20, 20)

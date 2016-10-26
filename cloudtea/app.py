@@ -31,7 +31,7 @@ class App(base.TFrame):
         #初始化所有的管理类
         self._init_managers()
 
-        self.resize(1000, 618)
+        self.resize(1100, 618)
         self.setObjectName('app')
         #QApplication.setWindowIcon(QIcon(APP_ICON))
         self.set_theme_style()
@@ -61,6 +61,8 @@ class App(base.TFrame):
         status_panel.theme_switch_btn.clicked.connect(
             self.refresh_themes)
 
+        self.ui.refresh_btn.clicked.connect(self.ready_show_data)
+
 
     def _init_managers(self):
         self.plugins_manager.load_plugins()
@@ -86,30 +88,20 @@ class App(base.TFrame):
     def show_request_progress(self, progress):
         self.ui.status_panel.network_status_label.show_progress(progress)
 
+    def ready_show_data(self):
+        self.ui.current_desktop.set_data(api.list_room())
+
     def show_current_desktop(self):
         self.ui.central_panel.top_panel.clean()  # 重置功能菜单
-        datas = api.list_room()
-        # This is dev data
-        datas=[
-            {"name":u"风花雪月"}, 
-            {"name":u"小桥流水"},
-            {"name":u"枯藤老树"},
-            {"name":u"葵花宝典"},
-            {"name":u"九阳真经"},
-            {"name":u"六脉神剑"},
-            {"name":u"凌波微步"},
-            {"name":u"隔山打牛"},
-            {"name":u"九阴真经"},
-            {"name":u"如来神掌"},
-            {"name":u"六脉神剑"},
-            {"name":u"移花接木"},
-            {"name":u"神龙摆尾"},
-            {"name":u"二龙戏珠"},
-            {"name":u"打狗棒法"}
-        ]
-        self.ui.current_desktop.set_data(datas)
+        self.ready_show_data()
         right_panel = self.ui.central_panel.right_panel
         right_panel.set_widget(self.ui.current_desktop)
+
+        top_panel = self.ui.central_panel.top_panel
+        top_panel.add_item(self.ui.refresh_btn)
+        top_panel.add_item(self.ui.vip_create_btn)
+        top_panel.add_item(self.ui.vip_recharge_btn)
+
 
 if __name__ == '__main__':
     logger_config()

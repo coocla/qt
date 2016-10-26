@@ -54,11 +54,10 @@ def create_table(models):
         model.metadata.create_all(get_engine())
         
 
-def query(model, args=None, session=None):
+def query(model, session=None):
     if session is None:
         session = get_session()
-    q = session.query(model) if not args else session.query(*args)
-    return q
+    return session.query(model)
     
     
 def get_random_string(length=8, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):

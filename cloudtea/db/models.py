@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, CHAR, DateTime, Text, Boolean, Float
 from sqlalchemy import ForeignKey, schema
@@ -7,6 +8,7 @@ from sqlalchemy.orm import relationship, backref
 
 from cloudtea.db.utils import create_table, make_password, check_password, get_session
 
+logger = logging.getLogger(__name__)
 Base = declarative_base()
 
 def NOW():
@@ -22,6 +24,30 @@ class Model(object):
     "extend_existing":True,
     }
     created_at = Column(DateTime, default=NOW)
+
+
+    def __init__(self, **kw):
+        for k,v in kw.items():
+            setattr(self, k, v)
+
+    def commit(self):
+        try:
+            session = get_session()
+            session.add(self)
+            session.flush()
+            return self.id, None
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return self, e
+
+    def delete(self, session):
+        try:
+            session.delete(self)
+            session.flush()
+            return None, None
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return self, e
 
 class Users(Base, Model):
     __tablename__ = 'users'
@@ -47,7 +73,7 @@ class Rooms(Base, Model):
     __tablename__ = 'rooms'
     id = Column(Integer, primary_key=True)
     name = Column(CHAR(50))
-    inused = Column(Boolean)
+    inused = Column(Boolean, default=False)
     vip_price = Column(Integer)
     common_price = Column(Integer)
     capacity = Column(Integer)

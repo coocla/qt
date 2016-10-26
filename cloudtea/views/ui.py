@@ -74,11 +74,10 @@ class TopPanel(base.TFrame):
     def add_item(self, widget):
         lastIndex = self._layout.count()
         if lastIndex:
-            item = self._layout.takeAt(lastIndex)
-            if isinstance(item, QSpacerItem):
-                self._layout.insertWidget(lastIndex, widget)
+            self._layout.insertSpacing(0, 10)
+            self._layout.insertWidget(1, widget)
         else:
-            self._layout.addSpacing(6)
+            self._layout.addSpacing(10)
             self._layout.addWidget(widget)
             self._layout.addStretch(1)
 
@@ -295,10 +294,15 @@ class UI(object):
     def __init__(self, app):
         self._box = QHBoxLayout()
         self._layout = QVBoxLayout(app)
+
         self.side_panel = LeftPanel_Container(app, app)
         self.central_panel = CentralPanel(app, app)
         self.current_desktop = components.RoomDesktop(app)
         self.status_panel = StatusPanel(app, app)
+
+        self.vip_recharge_btn = base.TLButton(app, u'会员充值')
+        self.vip_create_btn = base.TLButton(app, u'开通会员')
+        self.refresh_btn = base.TLButton(app, u'刷新')
         self.setup_ui()
 
     def setup_ui(self):
