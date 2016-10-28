@@ -4,8 +4,8 @@ from .order import Order
 __alias__ = u'活动配置'
 
 
-def enable(app):
-    v = Order(app)
+def enable(app, user):
+    v = Order(app, user)
 
 def disable(app):
     pass

@@ -29,7 +29,7 @@ class PluginsManager(object):
                 # plugin_name = module.__alias__
                 if plugin.check_policy(self.user):
                     # self._plugins[plugin_name] = module
-                    plugin.enable(self._app)
+                    plugin.enable(self._app, self.user)
                     logger.info('detect plugin %s' % plugin_name)
             except Exception as e:
                 logger.error('detect a bad plugin %s, traceback:\n%s' % (plugin_name, e), exc_info=True)

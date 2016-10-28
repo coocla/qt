@@ -42,10 +42,10 @@ class LoginWindow(QDialog):
         self.password.setGeometry(QtCore.QRect(200, 120, 221, 31))
         self.password.setObjectName(_fromUtf8("password"))
         self.login_btn = QPushButton(self.groupBox)
-        self.login_btn.setGeometry(QtCore.QRect(160, 220, 75, 23))
+        self.login_btn.setGeometry(QtCore.QRect(160, 220, 75, 28))
         self.login_btn.setObjectName(_fromUtf8("login_btn"))
         self.pushButton_2 = QPushButton(self.groupBox)
-        self.pushButton_2.setGeometry(QtCore.QRect(300, 220, 75, 23))
+        self.pushButton_2.setGeometry(QtCore.QRect(300, 220, 75, 28))
         self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
 
         self.retranslateUi()

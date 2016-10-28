@@ -4,8 +4,8 @@ from .room import ROOM
 __alias__ = u'房间管理'
 
 
-def enable(app):
-    r = ROOM(app)
+def enable(app, user):
+    r = ROOM(app, user)
 
 def disable(app):
     pass

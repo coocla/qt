@@ -337,3 +337,25 @@ class RoomTable(base.TTableWidget):
         for data in datas:
             self.add_item(data)
 
+class Input(base.TLineEdit):
+    def __init__(self, app, tiptext=None, parent=None):
+        super(Input, self).__init__(parent)
+        self._app = app
+        self.setObjectName('input')
+        self.setPlaceholderText(tiptext)
+        self.set_theme_style()
+
+    def set_theme_style(self):
+        style_str = '''
+            #{0} {{
+                background-color: #ffffff;
+                border: 1px solid #e5e6e7;
+                color: inherit;
+                width: 300px;
+                height: 30px;
+            }}
+            #{0}::focus {{
+                border-color: #39adb4;
+            }}
+        '''.format(self.objectName())
+        self.setStyleSheet(style_str)

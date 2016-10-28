@@ -4,7 +4,7 @@ import qtawesome as qta
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from PyQt5.QtWidgets import QFrame, QScrollArea, QHBoxLayout, QLabel, QTableWidget, \
-    QDialog, QLineEdit, QPushButton, QComboBox, QWidget, QMessageBox, QDesktopWidget
+    QDialog, QLineEdit, QPushButton, QComboBox, QWidget, QMessageBox, QDesktopWidget, QSpinBox
 
 from cloudtea import utils
 
@@ -18,6 +18,13 @@ class TFrame(QFrame):
 class TLabel(QLabel):
     def __init__(self, *args, **kwargs):
         super(TLabel, self).__init__(*args, **kwargs)
+
+    def set_theme_style(self):
+        pass
+
+class TSpinBox(QSpinBox):
+    def __init__(self, parent=None):
+        super(TSpinBox, self).__init__(parent)
 
     def set_theme_style(self):
         pass
@@ -303,6 +310,7 @@ class TagCellWidget(TFrame):
                 color: {0};
                 background: {1};
                 border-radius: 10px;
+                font-weight: 900;
             }}
         '''.format(color, background)
         return style_str
@@ -330,3 +338,32 @@ class TagCellWidget(TFrame):
         self._layout.addSpacing(10)
         self._layout.addStretch(1)
         self.tag.setFixedSize(20, 20)
+
+class SearchBox(TLineEdit):
+    def __init__(self, app, parent=None):
+        super(SearchBox,self).__init__(parent)
+        self._app = app
+        self.setObjectName('search_box')
+        self.setPlaceholderText(u'搜索')
+        self.setToolTip(u'输入要搜索的内容, 按下Enter继续 !')
+        self.set_theme_style()
+
+    def set_theme_style(self):
+        theme = self._app.theme_manager.current_theme
+        style_str = '''
+            #{0} {{
+                padding-left: 3px;
+                font-size: 14px;
+                background: transparent;
+                border: 0px;
+                border-bottom: 1px solid {1};
+                color: {2};
+                outline: none;
+            }}
+            #{0}:focus {{
+                outline: none;
+            }}
+        '''.format(self.objectName(),
+                   theme.color6.name(),
+                   theme.foreground.name())
+        self.setStyleSheet(style_str)

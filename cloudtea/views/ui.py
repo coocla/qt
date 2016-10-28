@@ -71,15 +71,18 @@ class TopPanel(base.TFrame):
         self.setFixedHeight(50)
         self._layout.addSpacing(5)
 
-    def add_item(self, widget):
-        lastIndex = self._layout.count()
-        if lastIndex:
-            self._layout.insertSpacing(0, 10)
-            self._layout.insertWidget(1, widget)
-        else:
-            self._layout.addSpacing(10)
+    def add_item(self, widget, last=False):
+        if last:
             self._layout.addWidget(widget)
-            self._layout.addStretch(1)
+        else:
+            lastIndex = self._layout.count()
+            if lastIndex:
+                self._layout.insertSpacing(0, 10)
+                self._layout.insertWidget(1, widget)
+            else:
+                self._layout.addSpacing(10)
+                self._layout.addWidget(widget)
+                self._layout.addStretch(1)
 
     def clean(self):
         for i in reversed(range(self._layout.count())):

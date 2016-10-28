@@ -4,8 +4,8 @@ from .datacenter import DataCenter
 __alias__ = u'数据中心'
 
 
-def enable(app):
-    v = DataCenter(app)
+def enable(app, user):
+    v = DataCenter(app, user)
 
 def disable(app):
     pass

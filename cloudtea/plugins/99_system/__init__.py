@@ -4,8 +4,8 @@ from .system import System
 __alias__ = u'系统设置'
 
 
-def enable(app):
-    v = System(app)
+def enable(app, user):
+    v = System(app, user)
 
 def disable(app):
     pass

@@ -4,29 +4,6 @@ from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QSizePolicy, QSpacerItem
 
 from cloudtea.widgets import base, components
 
-class Input(base.TLineEdit):
-    def __init__(self, app, tiptext=None, parent=None):
-        super(Input, self).__init__(parent)
-        self._app = app
-        self.setObjectName('input')
-        self.setPlaceholderText(tiptext)
-        self.set_theme_style()
-
-    def set_theme_style(self):
-        style_str = '''
-            #{0} {{
-                background-color: #ffffff;
-                border: 1px solid #e5e6e7;
-                color: inherit;
-                width: 300px;
-                height: 30px;
-            }}
-            #{0}::focus {{
-                border-color: #39adb4;
-            }}
-        '''.format(self.objectName())
-        self.setStyleSheet(style_str)
-
 
 class NewRoom(base.TDialog):
     def __init__(self, app, parent=None):
@@ -36,10 +13,10 @@ class NewRoom(base.TDialog):
         self._layout = QVBoxLayout(self)
         self.box = QVBoxLayout()
 
-        self.room_name = Input(self, u'房间名')
-        self.room_vip_price = Input(self, u'会员房费, 单位: 元')
-        self.room_common_price = Input(self, u'普通顾客房费, 单位: 元')
-        self.room_capacity = Input(self, u'房间可容纳人数, 单位: 位')
+        self.room_name = components.Input(self, u'房间名')
+        self.room_vip_price = components.Input(self, u'会员房费, 单位: 元')
+        self.room_common_price = components.Input(self, u'普通顾客房费, 单位: 元')
+        self.room_capacity = components.Input(self, u'房间可容纳人数, 单位: 位')
         self.ok_btn = base.TLButton(self._app, u'提交', size=19)
 
         self.head = components.ModalHeader(self._app, self)
@@ -100,6 +77,7 @@ class UI(object):
         self.room_item.set_img_text('>')
 
         #创建按钮
+        self.search_box = base.SearchBox(self._app)
         self.refresh_btn = base.TLButton(self._app, u'刷新')
         self.newroom_btn = base.TLButton(self._app, u'新增房间')
         self.delroom_btn = base.TLButton(self._app, u'删除房间')

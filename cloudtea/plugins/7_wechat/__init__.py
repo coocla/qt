@@ -4,8 +4,8 @@ from .wechat import WeChat
 __alias__ = u'微信营销'
 
 
-def enable(app):
-    v = WeChat(app)
+def enable(app, user):
+    v = WeChat(app, user)
 
 def disable(app):
     pass

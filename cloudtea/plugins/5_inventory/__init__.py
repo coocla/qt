@@ -4,8 +4,8 @@ from .inventory import Inventory
 __alias__ = u'库存管理'
 
 
-def enable(app):
-    v = Inventory(app)
+def enable(app, user):
+    v = Inventory(app, user)
 
 def disable(app):
     pass

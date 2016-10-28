@@ -4,8 +4,8 @@ from .vip import VIP
 __alias__ = u'会员中心'
 
 
-def enable(app):
-    v = VIP(app)
+def enable(app, user):
+    v = VIP(app, user)
 
 def disable(app):
     pass

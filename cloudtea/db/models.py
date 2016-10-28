@@ -60,6 +60,15 @@ class Users(Base, Model):
     sex = Column(CHAR(50))
     role = Column(Integer, default=2)  #0-超级管理员 1-收银员 2-服务员
 
+    @property
+    def role_display(self):
+        if self.role == 0:
+            return u"超级管理员"
+        elif self.role == 1:
+            return u"收银员"
+        else:
+            return u"服务员"
+
 
 class Members(Base, Model):
     __tablename__ = 'members'
