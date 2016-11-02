@@ -1,7 +1,10 @@
 #coding:utf-8
+from PyQt5.QtWidgets import QMessageBox
+
 from .ui import UI
-from cloudtea.db import api
-from cloudtea.widgets import base
+
+from cloudtea.db import api, utils
+from cloudtea.widgets import base 
 
 
 class User(base.TObject):
@@ -41,7 +44,26 @@ class User(base.TObject):
         self.ui.newuser_dialog.show()
 
     def ready_to_delete(self):
-        pass
+        index=self.ui.desktop.currentIndex().row()
+        Msg = base.Message('warning', self.ui.newuser_dialog)
+        if index < 0:
+            Msg.show(u'错误', u'请先选中要删除的店员')
+        else:
+            session = utils.get_session()
+            selected = self.ui.desktop.data[index]
+            user = api.get_user(selected.id, session=session)
+            if not user:
+                Msg.show(u'错误', u'选中的店员已经不存在了,刷新在看看?')
+            else:
+                reply = Msg.show(u'警告', u'你确定要删除店员 [%s] ?' % user.name, confirm=True)
+                if reply == QMessageBox.Yes:
+                    user, _err = user.delete(session)
+                    if _err:
+                        Msg.show(u'错误', u'删除失败: %s' % _err)
+                    else:
+                        Msg = base.Message('information', self.ui.newuser_dialog)
+                        Msg.show(u'成功', u'店员删除成功!')
+                        self.ui.desktop.removeRow(index)
 
     def ready_to_create(self):
         Msg = base.Message('warning', self.ui.newuser_dialog)
@@ -59,7 +81,6 @@ class User(base.TObject):
                 user = api.get_user(pk)
                 self.ui.desktop.add_item(user)
                 p.hide()
-
 
     def ready_to_search(self):
         text = self.ui.search_box.text()

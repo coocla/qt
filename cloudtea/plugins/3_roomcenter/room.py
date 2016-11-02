@@ -1,7 +1,8 @@
 #coding:utf-8
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 
 from .ui import UI
+
 from cloudtea.db import api, utils
 from cloudtea.widgets import base
 

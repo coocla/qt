@@ -40,6 +40,19 @@ class NewUser(base.TDialog):
         self.set_theme_style()
         self.setup_ui()
 
+    def reset(self):
+        self.name.setText('')
+        self.username.setText('')
+        self.password.setText('')
+        self.password_confirm.setText('')
+        self.phone.setText('')
+
+    def hideEvent(self, event):
+        self.reset()
+
+    def closeEvent(self, event):
+        self.reset()
+
     def setup_ui(self):
         self.resize(800, 600)
         self._layout.setContentsMargins(0,0,0,0)
@@ -50,21 +63,21 @@ class NewUser(base.TDialog):
         
         self.box.setContentsMargins(0,0,0,0)
         self.box.setSpacing(0)
-        self.box.addSpacing(15)
+        self.box.addSpacing(10)
         self.box.addWidget(self.name)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.username)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.password)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.password_confirm)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.age)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.sex)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.role)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.phone)
         self.box.addStretch(1)
 

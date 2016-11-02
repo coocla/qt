@@ -27,6 +27,18 @@ class NewVip(base.TDialog):
         self.set_theme_style()
         self.setup_ui()
 
+    def reset(self):
+        self.name.setText('')
+        self.vip_id.setText('')
+        self.phone.setText('')
+        self.amount.setText('')
+
+    def hideEvent(self, event):
+        self.reset()
+
+    def closeEvent(self, event):
+        self.reset()
+
     def setup_ui(self):
         self.resize(800, 500)
         self._layout.setContentsMargins(0,0,0,0)
@@ -37,14 +49,15 @@ class NewVip(base.TDialog):
         
         self.box.setContentsMargins(0,0,0,0)
         self.box.setSpacing(0)
-        self.box.addSpacing(15)
+        self.box.addSpacing(10)
         self.box.addWidget(self.name)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.vip_id)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.phone)
-        self.box.addSpacing(20)
+        self.box.addSpacing(10)
         self.box.addWidget(self.amount)
+        self.box.addStretch(1)
 
         self.head.set_header(u'添加会员')
         self.foot.add_item(self.ok_btn)
@@ -174,6 +187,7 @@ class UI(object):
         self.vip_item = base.TGroupItem(self._app, u'会员管理')
         self.vip_item.set_img_text('>')
         self.search_box = base.SearchBox(self._app)
+        self.delvip_btn = base.TLButton(self._app, u'删除会员')
         self.newvip_btn = base.TLButton(self._app, u'开通会员')
         self.viprecharge_btn = base.TLButton(self._app, u'会员充值')
         self.refresh_btn = base.TLButton(self._app, u'刷新')

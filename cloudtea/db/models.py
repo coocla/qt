@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 import logging
+
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, CHAR, DateTime, Text, Boolean, Float
-from sqlalchemy import ForeignKey, schema
+from sqlalchemy import Column, Integer, String, VARCHAR, DateTime, Text, Boolean, Float
+from sqlalchemy import ForeignKey, schema, Table
 from sqlalchemy.orm import relationship, backref
 
 from cloudtea.db.utils import create_table, make_password, check_password, get_session
@@ -49,15 +50,16 @@ class Model(object):
             logger.error(e, exc_info=True)
             return self, e
 
+
 class Users(Base, Model):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(CHAR(50), unique=True)
-    username = Column(CHAR(50), unique=True, index=True)
-    password = Column(CHAR(100))
-    phone = Column(CHAR(100))
+    name = Column(VARCHAR(50), unique=True)
+    username = Column(VARCHAR(50), unique=True, index=True)
+    password = Column(VARCHAR(100))
+    phone = Column(VARCHAR(100))
     age = Column(Integer)
-    sex = Column(CHAR(50))
+    sex = Column(VARCHAR(50))
     role = Column(Integer, default=2)  #0-超级管理员 1-收银员 2-服务员
 
     @property
@@ -73,56 +75,54 @@ class Users(Base, Model):
 class Members(Base, Model):
     __tablename__ = 'members'
     id = Column(Integer, primary_key=True)
-    name = Column(CHAR(50))
-    vip_id = Column(CHAR(100))
-    phone = Column(CHAR(100))
+    name = Column(VARCHAR(50))
+    vip_id = Column(VARCHAR(100))
+    phone = Column(VARCHAR(100))
     amount = Column(Integer)
 
 class Rooms(Base, Model):
     __tablename__ = 'rooms'
     id = Column(Integer, primary_key=True)
-    name = Column(CHAR(50))
+    name = Column(VARCHAR(50))
     inused = Column(Boolean, default=False)
     vip_price = Column(Integer)
     common_price = Column(Integer)
     capacity = Column(Integer)
     opened_at = Column(DateTime)
     
-# class Category(Base, Model):
-#     __tablename__ = 'category'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(CHAR(50))
-#     inventory = relationship('Inventory')
+class Category(Base, Model):
+    __tablename__ = 'category'
+    id = Column(Integer, primary_key=True)
+    name = Column(VARCHAR(50))
+    inventory = relationship('Inventory')
     
-# class Inventory(Base, Model):
-#     __tablename__ = 'inventory'
-#     __table_args__ = (
-#         schema.UniqueConstraint('name', 'specifications', name='uniq_name0specifications'), 
-#     )
-#     id = Column(Integer, primary_key=True)
-#     name = Column(CHAR(50))
-#     category_id = Column(Integer, ForeignKey('category.id'), nullable=False)
-#     number = Column(Integer)   # 数量
-#     unitprice = Column(Float)  # 单价
-#     unit = Column(CHAR(100))   # 单位
-#     specifications = Column(CHAR(100))  # 商品规格
-    
-# class InventoryEntry(Base, Model):
-#     __tablename__ = 'inventoryentry'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(CHAR(50))
-#     category_id = Column(Integer, ForeignKey('category.id'), nullable=False)
-#     specifications = Column(CHAR(100))
-#     number = Column(Integer)
-    
-    
+class Inventory(Base, Model):
+    __tablename__ = 'inventory'
+    id = Column(Integer, primary_key=True)
+    name = Column(VARCHAR(50))             # 品名
+    specifications = Column(VARCHAR(100))  # 规格
+    number = Column(Integer)            # 数量
+    meter = Column(Integer)             # 计量方式   0 重量  1 袋
+    price = Column(Integer)             # 价格
+    suttle = Column(Integer)            # 净重
+    category_id = Column(Integer, ForeignKey('category.id'), nullable=False)
+
+
+class UserInventory(Base, Model):
+    __tablename__ = 'user_inventory'
+    id = Column(Integer, primary_key=True)
+    surplus = Column(Integer)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    inventory_id = Column(Integer, ForeignKey('inventory.id'))
+
+
 def check_and_create_super_admin():
     session = get_session()
     super_admin = session.query(Users).filter_by(id=1).first()
     if not super_admin:
-        super_admin = Users(name=u"超级管理员", username="admin", password=make_password('123456'), age=24, sex=u'女', role=0, id=1)
+        super_admin = Users(name=u"超级管理员", username="admin", password=make_password('123456'.encode('utf-8')), age=24, sex=u'女', role=0, id=1)
         session.add(super_admin)
         session.flush()
-    
-create_table((Users, Members, Rooms))
+
+create_table((Users, Members, Rooms, Category, Inventory, UserInventory))
 check_and_create_super_admin()

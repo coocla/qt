@@ -46,11 +46,29 @@ def create_room(user, name, vp, cp, capacity):
 
 ########## VIP Model ##########
 def get_vip(pk, session=None):
-    return query(Members, session=session).filter_by(id=pk).first()
+    return query(Members, session=session).filter(or_(Members.id==pk, Members.vip_id==pk)).first()
 
 def list_vip():
     return query(Members).all()
     
+def search_vip(text):
+    return query(Members).filter(or_(Members.name.like('%%%s%%' % text), Members.vip_id.like('%%%s%%' % text), \
+        Members.phone.like('%%%s%%' % text))).all()
+
+def create_vip(user, name, vip_id, amount, phone):
+    vip = Members(name=name, vip_id=vip_id, amount=amount, phone=phone)
+    return vip.commit()
+
+########## Inventory Model ##########
+def get_inventory(pk, session=None):
+    return query(Inventory, session=session).filter_by(id=pk).first()
+
+def list_inventory():
+    return query(Inventory).all()
+
+def search_inventory(text):
+    return query(Inventory).filter(Inventory.name.like('%%%s%%' % text)).all()
+
 if __name__ == '__main__':
 	get_user('admin')
 	
