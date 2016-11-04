@@ -28,6 +28,7 @@ class ROOM(base.TObject):
         self.ui.desktop.set_data(api.list_room())
 
     def ready_show_desktop(self):
+        self._app.message('提醒: 已切换至 房间管理 菜单')
         self._app.ui.central_panel.top_panel.clean()
         self.ready_show_data()
         # 替换桌面

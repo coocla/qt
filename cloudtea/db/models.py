@@ -79,6 +79,7 @@ class Members(Base, Model):
     vip_id = Column(VARCHAR(100))
     phone = Column(VARCHAR(100))
     amount = Column(Integer)
+    stock = relationship('Stocks', backref='member')
 
 class Rooms(Base, Model):
     __tablename__ = 'rooms'
@@ -94,7 +95,7 @@ class Category(Base, Model):
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
     name = Column(VARCHAR(50))
-    inventory = relationship('Inventory')
+    inventory = relationship('Inventory', backref='category')
     
 class Inventory(Base, Model):
     __tablename__ = 'inventory'
@@ -106,13 +107,21 @@ class Inventory(Base, Model):
     price = Column(Integer)             # 价格
     suttle = Column(Integer)            # 净重
     category_id = Column(Integer, ForeignKey('category.id'), nullable=False)
+    oversale = relationship('Stocks', backref='inventory')
+
+    @property
+    def meter_display(self):
+        if self.meter == 0:
+            return u"克"
+        elif self.meter == 1:
+            return u"袋"
 
 
-class UserInventory(Base, Model):
-    __tablename__ = 'user_inventory'
+class Stocks(Base, Model):
+    __tablename__ = 'stocks'
     id = Column(Integer, primary_key=True)
-    surplus = Column(Integer)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    surplus = Column(Integer)               # 剩余
+    member_id = Column(Integer, ForeignKey('members.id'))
     inventory_id = Column(Integer, ForeignKey('inventory.id'))
 
 
@@ -124,5 +133,5 @@ def check_and_create_super_admin():
         session.add(super_admin)
         session.flush()
 
-create_table((Users, Members, Rooms, Category, Inventory, UserInventory))
+create_table((Users, Members, Rooms, Category, Inventory, Stocks))
 check_and_create_super_admin()

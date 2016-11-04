@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import *
 
 from cloudtea.db import api, utils
 from cloudtea.widgets import base
-from cloudtea.views import widgets
 
 try:
     _encoding = QApplication.UnicodeUTF8

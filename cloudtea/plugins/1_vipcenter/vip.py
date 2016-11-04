@@ -26,6 +26,7 @@ class VIP(base.TObject):
 
 
     def ready_show_desktop(self):
+        self._app.message('提醒: 已切换至 会员管理 菜单')
         self._app.ui.central_panel.top_panel.clean()
         self.ready_show_data()
 

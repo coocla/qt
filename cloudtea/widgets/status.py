@@ -16,7 +16,7 @@ class TipsManager(object):
 
     def show_random_tip(self):
         tip = random.choice(self.tips)
-        self._app.message('小提示: %s' % tip)
+        self._app.message(u'小提示: %s' % tip)
 
 class MessageLabel(base.TLabel):
     def __init__(self, app, parent=None):

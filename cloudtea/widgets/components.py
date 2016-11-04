@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor, QFont, QPalette
 
 from cloudtea.db import api
 from cloudtea.utils import darker
-from cloudtea.widgets import base
+from cloudtea.widgets import base, pay
 
 
 class ModalHeader(base.TFrame):
@@ -140,7 +140,6 @@ class RoomDesktop(base.TTableWidget):
         self.verticalHeader().hide()
         self.horizontalHeader().hide()
         self.setAlternatingRowColors(True)
-        self.cellDoubleClicked.connect(self.on_cell_dbclick)
 
         self.setObjectName('music_table')
         self.set_theme_style()
@@ -207,9 +206,6 @@ class RoomDesktop(base.TTableWidget):
                    theme.color0.name(), 
                    theme.color7_light.name())
         self.setStyleSheet(style_str)
-
-    def on_cell_dbclick(self, row, column):
-        print('Double here %s,%s' % (row, column))
 
     def add_item(self, model_index, model_data, resize=False):
         name_item = RoomItem(self._app, model_data)
@@ -352,10 +348,25 @@ class Input(base.TLineEdit):
                 border: 1px solid #e5e6e7;
                 color: inherit;
                 width: 300px;
-                height: 30px;
+                height: 20px;
             }}
             #{0}::focus {{
                 border-color: #39adb4;
+            }}
+        '''.format(self.objectName())
+        self.setStyleSheet(style_str)
+
+class Select(base.QComboBox):
+    def __init__(self, app, parent=None):
+        super(Select, self).__init__(parent)
+        self._app = app
+        self.setObjectName('select')
+        self.set_theme_style()
+
+    def set_theme_style(self):
+        style_str = '''
+            #{0} {{
+                height:20px;
             }}
         '''.format(self.objectName())
         self.setStyleSheet(style_str)

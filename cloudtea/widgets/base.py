@@ -147,6 +147,59 @@ class TGroupHeader(TFrame):
     def set_header(self, text):
         self.title_label.setText(text)
 
+
+class TCItem(TFrame):
+    clicked = pyqtSignal()
+
+    def __init__(self, app, name=None, parent=None):
+        super(TCItem, self).__init__(parent)
+        self._app = app
+
+        self.is_selected=False
+        self._layout = QHBoxLayout(self)
+        self._name_label = TLabel(name, self)
+        self.setObjectName('tc_group_item')
+        self._name_label.setObjectName('tc_group_item_name')
+        self.set_theme_style()
+        self.setup_ui()
+
+    def set_theme_style(self):
+        theme = self._app.theme_manager.current_theme
+        style_str = '''
+            #{0} {{
+                background: transparent;
+            }}
+            #{1} {{
+                border-top: 1px solid #F8F8F8;
+                border-bottom: 1px solid #F8F8F8;
+                color: {2};
+                font-size: 13px;
+            }}
+        '''.format(self.objectName(),
+                   self._name_label.objectName(),
+                   theme.background.name())
+        self.setStyleSheet(style_str)
+
+    def setup_ui(self):
+        self._layout.setContentsMargins(0,0,0,0)
+        self._layout.setSpacing(0)
+        self.setFixedHeight(26)
+        self._layout.addWidget(self._name_label)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton and self.rect().contains(event.pos()):
+            self.clicked.emit()
+            self._name_label.setStyleSheet('color: #489AFE;') 
+
+    def enterEvent(self, event): 
+        theme = self._app.theme_manager.current_theme 
+        label_hover_color = theme.color5 
+        if self.is_selected: 
+            return 
+        self._name_label.setStyleSheet(
+            'color: {0};'.format(label_hover_color.name()))
+
+
 class TGroupItem(TFrame):
     clicked = pyqtSignal()
 
@@ -160,6 +213,7 @@ class TGroupItem(TFrame):
         self._img_label = TLabel(self)
         self._name_label = TLabel(name, self)
 
+        
         self.setObjectName('lp_group_item')
         self._flag_label.setObjectName('lp_groun_item_flag')
         self._flag_label.setIndent(5)
@@ -214,7 +268,6 @@ class TGroupItem(TFrame):
             return 
         self._img_label.setStyleSheet('color: {0};'.format(label_color.name())) 
         self._name_label.setStyleSheet('color: {0};'.format(label_color.name())) 
-
 
     def setup_ui(self):
         self._layout.setContentsMargins(0,0,0,0)

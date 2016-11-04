@@ -31,6 +31,7 @@ class User(base.TObject):
         self.ui.desktop.set_data(api.list_user())
 
     def ready_show_desktop(self):
+        self._app.message('提醒: 已切换至 店员管理 菜单')
         self._app.ui.central_panel.top_panel.clean()
         self.ready_show_data()
         self._app.ui.central_panel.right_panel.set_widget(self.ui.desktop)

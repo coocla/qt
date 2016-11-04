@@ -9,7 +9,7 @@ from cloudtea import logger_config, utils
 from cloudtea.db import api
 from cloudtea.consts import DEFAULT_THEME_NAME
 from cloudtea.views import login, ui
-from cloudtea.widgets import base, status
+from cloudtea.widgets import base, status, pay
 from cloudtea.plugins import PluginsManager
 from cloudtea.themes import ThemesManager
 
@@ -28,6 +28,7 @@ class App(base.TFrame):
         self.player_pixmap = None
 
         self.ui = ui.UI(self)
+        self.payui = pay.PayUi(self)
         #初始化所有的管理类
         self._init_managers()
 
@@ -60,9 +61,8 @@ class App(base.TFrame):
             self.theme_manager.choose)
         status_panel.theme_switch_btn.clicked.connect(
             self.refresh_themes)
-
         self.ui.refresh_btn.clicked.connect(self.ready_show_data)
-
+        self.ui.current_desktop.cellDoubleClicked.connect(self.ready_show_pay)
 
     def _init_managers(self):
         self.plugins_manager.load_plugins()
@@ -92,6 +92,8 @@ class App(base.TFrame):
         self.ui.current_desktop.set_data(api.list_room())
 
     def show_current_desktop(self):
+
+        self.message(u'提醒: 已切换至 桌面 菜单')
         self.ui.central_panel.top_panel.clean()  # 重置功能菜单
         self.ready_show_data()
         right_panel = self.ui.central_panel.right_panel
@@ -101,6 +103,12 @@ class App(base.TFrame):
         top_panel.add_item(self.ui.refresh_btn)
         top_panel.add_item(self.ui.vip_create_btn)
         top_panel.add_item(self.ui.vip_recharge_btn)
+
+    def ready_show_pay(self, row, column):
+        for cate in api.list_category():
+            item = base.TCItem(self, cate.name)
+            self.payui.category_panel.listitem.add_item(item)
+        self.payui.show()
 
 
 if __name__ == '__main__':
