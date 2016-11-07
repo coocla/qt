@@ -63,6 +63,7 @@ class App(base.TFrame):
             self.refresh_themes)
         self.ui.refresh_btn.clicked.connect(self.ready_show_data)
         self.ui.current_desktop.cellDoubleClicked.connect(self.ready_show_pay)
+        self.payui.metering_dialog.ok_btn.clicked.connect(self.push_shopping_car)
 
     def _init_managers(self):
         self.plugins_manager.load_plugins()
@@ -105,10 +106,66 @@ class App(base.TFrame):
         top_panel.add_item(self.ui.vip_recharge_btn)
 
     def ready_show_pay(self, row, column):
+        table = self.sender()
+        pos = table.lineNum * row + column + 1
+        if len(table.data) < pos:
+            return
+        self.payui.category_panel.listitem.clean()
+        # 添加默认的全部分类器
+        item = base.TGroupItem(self, u'全部')
+        item.set_img_text('>')
+        item.set_item_value(0)
+        item.clicked.connect(self.inventory_filter_category)
+        self.payui.category_panel.listitem.add_item(item)
+
         for cate in api.list_category():
-            item = base.TCItem(self, cate.name)
+            item = base.TGroupItem(self, cate.name)
+            item.set_img_text('>')
+            item.set_item_value(cate.id)
+            item.clicked.connect(self.inventory_filter_category)
             self.payui.category_panel.listitem.add_item(item)
+        self.fill_inventory(api.list_inventory())
         self.payui.show()
+
+    def fill_inventory(self, data):
+        self.payui.inventory_panel.listitem.clean()
+        for inventory in data:
+            item = base.TCItem(self, inventory)
+            item.clicked.connect(self.confirm_shopping_car)
+            self.payui.inventory_panel.listitem.add_item(item)
+
+    def inventory_filter_category(self):
+        self.payui.inventory_panel.listitem.clean()
+        pk = self.sender().item_value
+        if pk == 0:
+            self.fill_inventory(api.list_inventory())
+        else:
+            category = api.get_category(pk)
+            self.fill_inventory(category.inventory.all())
+        
+
+    def confirm_shopping_car(self):
+        inventory_id = self.sender().item_value
+        self.payui.metering_dialog.set_inventory(inventory_id)
+        self.payui.metering_dialog.show()
+
+    def push_shopping_car(self):
+        Msg = base.Message('warning', self.payui.metering_dialog)
+        number = self.payui.metering_dialog._input.text()
+        try:
+            number = int(number.strip())
+        except:
+            Msg.show(u'错误', u'请填写合法的数字')
+            return
+        inventory = api.get_inventory(self.payui.metering_dialog.item_value)
+        if number > inventory.number * inventory.suttle:
+            Msg.show(u'错误', u'库存不够了, 剩余: %s, 让老板进货吧!!!' % inventory.number * inventory.suttle)
+            return
+        self.payui.metering_dialog.hide()
+
+        pre_sale = base.ShopItem(self, inventory, number)
+        self.payui.bil_Panel.listitem.add_item(pre_sale)
+
 
 
 if __name__ == '__main__':

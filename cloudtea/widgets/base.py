@@ -148,57 +148,132 @@ class TGroupHeader(TFrame):
         self.title_label.setText(text)
 
 
-class TCItem(TFrame):
+class ShopItem(TFrame):
     clicked = pyqtSignal()
 
-    def __init__(self, app, name=None, parent=None):
-        super(TCItem, self).__init__(parent)
+    def __init__(self, app, goods, number, parent=None):
+        super(ShopItem, self).__init__(parent)
         self._app = app
-
-        self.is_selected=False
+        self.setObjectName('shoppay')
         self._layout = QHBoxLayout(self)
-        self._name_label = TLabel(name, self)
-        self.setObjectName('tc_group_item')
-        self._name_label.setObjectName('tc_group_item_name')
+        self._name_label = TLabel('%s' % goods.name, self)
+        self._info_label = TLabel('x%s ￥%s/%s' % (number, goods.price//goods.suttle, goods.meter_display), self)
+        self._total_label = TLabel('￥%s' % (number*goods.price), self)
+        self._name_label.setFixedWidth(210)
+        self._info_label.setFixedWidth(100)
+        self._total_label.setFixedWidth(80)
         self.set_theme_style()
         self.setup_ui()
 
+    def setup_ui(self):
+        self._layout.setContentsMargins(10,0,0,0)
+        self._layout.setSpacing(0)
+        self.setFixedHeight(30)
+        self._layout.addWidget(self._name_label)
+        self._layout.addStretch(1)
+        self._layout.addWidget(self._info_label)
+        self._layout.addSpacing(30)
+        self._layout.addWidget(self._total_label)
+        self._layout.addSpacing(30)
+        self._layout.addWidget(CancelTag(self._app))
+
     def set_theme_style(self):
+        #1765C7
         theme = self._app.theme_manager.current_theme
         style_str = '''
             #{0} {{
-                background: transparent;
+                background: {5};
             }}
             #{1} {{
-                border-top: 1px solid #F8F8F8;
-                border-bottom: 1px solid #F8F8F8;
                 color: {2};
-                font-size: 13px;
+                font-size: 17px;
+            }}
+            #{3} {{
+                color: {2};
+                font-size: 17px;
+            }}
+            #{4} {{
+                color: {2};
+                font-size: 17px;
             }}
         '''.format(self.objectName(),
                    self._name_label.objectName(),
-                   theme.background.name())
+                   '#FFFFFF',
+                   self._info_label.objectName(),
+                   self._total_label.objectName(),
+                   '#1765C7')
+        self.setStyleSheet(style_str)
+
+
+class TCItem(TFrame):
+    clicked = pyqtSignal()
+
+    def __init__(self, app, inventory, parent=None):
+        super(TCItem, self).__init__(parent)
+        self._app = app
+
+        self._layout = QHBoxLayout(self)
+        self._name_label = TLabel('%s' % inventory.name, self)
+        self._number_label = TLabel('库存: %s' % inventory.number, self)
+        self._price_label = TLabel('￥%s' % inventory.price, self)
+        self._name_label.setFixedWidth(210)
+        self._number_label.setFixedWidth(100)
+        self._price_label.setFixedWidth(80)
+        self.setObjectName('tc_group_item')
+        self.item_value = inventory.id
+        self._name_label.setObjectName('tc_group_item_name')
+        self._number_label.setObjectName('tc_group_item_number')
+        self._price_label.setObjectName('tc_group_item_price')
+        self.set_theme_style()
+        self.setup_ui()
+
+    def set_theme_style(self, background='transparent'):
+        theme = self._app.theme_manager.current_theme
+        style_str = '''
+            #{0} {{
+                background: {5};
+            }}
+            #{1} {{
+                color: {2};
+                font-size: 15px;
+            }}
+            #{3} {{
+                color: {2};
+                font-size: 15px;
+            }}
+            #{4} {{
+                color: {2};
+                font-size: 15px;
+            }}
+        '''.format(self.objectName(),
+                   self._name_label.objectName(),
+                   '#FFFFFF',
+                   self._number_label.objectName(),
+                   self._price_label.objectName(),
+                   background)
         self.setStyleSheet(style_str)
 
     def setup_ui(self):
-        self._layout.setContentsMargins(0,0,0,0)
+        self._layout.setContentsMargins(10,3,1,2)
         self._layout.setSpacing(0)
-        self.setFixedHeight(26)
+        # self.setFixedHeight(26)
         self._layout.addWidget(self._name_label)
+        self._layout.addStretch(1)
+        self._layout.addWidget(self._number_label)
+        self._layout.addSpacing(30)
+        self._layout.addWidget(self._price_label)
 
-    def mouseReleaseEvent(self, event):
+    def enterEvent(self, event):
+        '''鼠标划上去'''
+        self.set_theme_style(background='#FD7054')
+
+    def leaveEvent(self, event):
+        '''鼠标划走'''
+        self.set_theme_style()
+
+    def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton and self.rect().contains(event.pos()):
             self.clicked.emit()
-            self._name_label.setStyleSheet('color: #489AFE;') 
-
-    def enterEvent(self, event): 
-        theme = self._app.theme_manager.current_theme 
-        label_hover_color = theme.color5 
-        if self.is_selected: 
-            return 
-        self._name_label.setStyleSheet(
-            'color: {0};'.format(label_hover_color.name()))
-
 
 class TGroupItem(TFrame):
     clicked = pyqtSignal()
@@ -212,6 +287,7 @@ class TGroupItem(TFrame):
         self._flag_label = TLabel(self)
         self._img_label = TLabel(self)
         self._name_label = TLabel(name, self)
+        self.item_value = None
 
         
         self.setObjectName('lp_group_item')
@@ -281,8 +357,12 @@ class TGroupItem(TFrame):
         self._layout.addSpacing(2)
         self._layout.addWidget(self._name_label)
 
+
     def set_img_text(self, text):
         self._img_label.setText(text)
+
+    def set_item_value(self, text):
+        self.item_value = text
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton and self.rect().contains(event.pos()):
@@ -334,6 +414,55 @@ class Message(QWidget):
         else:
             win = getattr(QMessageBox, self.level)
             return win(self, header, text)
+
+
+class CancelTag(TFrame):
+    def __init__(self, app):
+        super(CancelTag, self).__init__()
+        self._app = app
+        self.setObjectName('tag_cell')
+        self.tag = TLabel('×', self)
+        self.tag.setObjectName('download_tag')
+        self.tag.setAlignment(Qt.AlignCenter)
+        self.set_theme_style()
+
+        self._layout = QHBoxLayout(self)
+        self.setup_ui()
+
+    @property
+    def download_label_style(self):
+        theme = self._app.theme_manager.current_theme
+        background = utils.set_alpha(theme.color7, 50).name(QColor.HexArgb)
+        color = utils.set_alpha(theme.color7, 30).name(QColor.HexArgb)
+        style_str = '''
+            #download_tag {{
+                color: {0};
+                background: {1};
+                border-radius: 10px;
+                font-weight: 900;
+            }}
+        '''.format(color, background)
+        return style_str
+
+    def set_theme_style(self):
+        theme = self._app.theme_manager.current_theme
+        style_str = '''
+            #{0} {{
+                background: transparent;
+            }}
+        '''.format(self.objectName())
+        style_str = style_str + self.download_label_style
+        self.setStyleSheet(style_str)
+
+    def setup_ui(self):
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._layout.setSpacing(0)
+
+        self._layout.addSpacing(10)
+        self._layout.addWidget(self.tag)
+        self._layout.addSpacing(10)
+        self._layout.addStretch(1)
+        self.tag.setFixedSize(20, 20)
 
 
 class TagCellWidget(TFrame):

@@ -150,7 +150,7 @@ class CategoryTable(base.TTableWidget):
 
     def add_item(self, model_data):
         name = QTableWidgetItem(model_data.name)
-        inventory = QTableWidgetItem('%s' % len(model_data.inventory))
+        inventory = QTableWidgetItem('%s' % model_data.inventory.count())
 
         row = self.rowCount()
         self.setRowCount(row+1)
@@ -160,6 +160,7 @@ class CategoryTable(base.TTableWidget):
 
     def set_data(self, datas):
         self.setRowCount(0)
+        self.data = []
         for data in datas:
             self.add_item(data)
 

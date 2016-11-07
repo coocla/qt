@@ -7,6 +7,7 @@ from sqlalchemy import Column, Integer, String, VARCHAR, DateTime, Text, Boolean
 from sqlalchemy import ForeignKey, schema, Table
 from sqlalchemy.orm import relationship, backref
 
+from cloudtea.utils import orderID
 from cloudtea.db.utils import create_table, make_password, check_password, get_session
 
 logger = logging.getLogger(__name__)
@@ -79,7 +80,7 @@ class Members(Base, Model):
     vip_id = Column(VARCHAR(100))
     phone = Column(VARCHAR(100))
     amount = Column(Integer)
-    stock = relationship('Stocks', backref='member')
+    stock = relationship('Stocks', backref='member', lazy='dynamic')
 
 class Rooms(Base, Model):
     __tablename__ = 'rooms'
@@ -95,7 +96,7 @@ class Category(Base, Model):
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
     name = Column(VARCHAR(50))
-    inventory = relationship('Inventory', backref='category')
+    inventory = relationship('Inventory', backref='category', lazy='dynamic')
     
 class Inventory(Base, Model):
     __tablename__ = 'inventory'
@@ -105,16 +106,19 @@ class Inventory(Base, Model):
     number = Column(Integer)            # 数量
     meter = Column(Integer)             # 计量方式   0 重量  1 袋
     price = Column(Integer)             # 价格
-    suttle = Column(Integer)            # 净重
+    suttle = Column(Integer)            # 可分几次使用, 例如: 10袋/盒,每次最少用1袋,即可分10次使用
     category_id = Column(Integer, ForeignKey('category.id'), nullable=False)
-    oversale = relationship('Stocks', backref='inventory')
+    oversale = relationship('Stocks', backref='inventory', lazy='dynamic')
 
     @property
     def meter_display(self):
         if self.meter == 0:
             return u"克"
         elif self.meter == 1:
-            return u"袋"
+            if 'ml' in self.specifications or u'升' in self.specifications:
+                return u"瓶"
+            else:
+                return u'袋'
 
 
 class Stocks(Base, Model):
@@ -123,6 +127,23 @@ class Stocks(Base, Model):
     surplus = Column(Integer)               # 剩余
     member_id = Column(Integer, ForeignKey('members.id'))
     inventory_id = Column(Integer, ForeignKey('inventory.id'))
+
+
+class Orders(Base, Model):
+    __tablename__ = 'orders'
+    id = Column(VARCHAR(50), default=orderID, primary_key=True)
+    room = Column(Integer, ForeignKey('rooms.id'))
+    waiter = Column(Integer, ForeignKey('users.id'))
+    info = relationship('OrderInfo', backref='order', lazy='dynamic')
+    amount = Column(Integer)                # 总计
+    payment = Column(Integer)   # 0现金 1会员卡 2银行卡 3微信 4支付宝
+
+class OrderInfo(Base, Model):
+    __tablename__ = 'orderinfo'
+    id = Column(Integer, primary_key=True)
+    order_id = Column(VARCHAR(50), ForeignKey('orders.id'))
+
+
 
 
 def check_and_create_super_admin():

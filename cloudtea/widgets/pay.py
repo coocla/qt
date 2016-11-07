@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QSpacerItem, QWidgetItem
 from PyQt5.QtCore import Qt
 
-from cloudtea.widgets import base
+from cloudtea.widgets import base, components
 
 class TopPanel(base.TFrame):
     def __init__(self, app, parent=None):
@@ -28,25 +28,15 @@ class TopPanel(base.TFrame):
                    theme.color0_light.name()) 
         self.setStyleSheet(style_str) 
 
-
     def setup_ui(self):
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._layout.setSpacing(0)
         self.setFixedHeight(50)
-        self._layout.addSpacing(5)
+        self._layout.addStretch(1)
 
     def add_item(self, widget, last=False):
-        if last:
-            self._layout.addWidget(widget)
-        else:
-            lastIndex = self._layout.count()
-            if lastIndex:
-                self._layout.insertSpacing(0, 10)
-                self._layout.insertWidget(1, widget)
-            else:
-                self._layout.addSpacing(10)
-                self._layout.addWidget(widget)
-                self._layout.addStretch(1)
+        self._layout.addSpacing(10)
+        self._layout.addWidget(widget)
 
     def clean(self):
         for i in reversed(range(self._layout.count())):
@@ -77,10 +67,16 @@ class ListItem(base.TFrame):
     def setup_ui(self):
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._layout.setSpacing(0)
-        self._layout.addSpacing(8)
+        # self._layout.addSpacing(8)
 
     def add_item(self, item):
         self._layout.addWidget(item)
+
+    def clean(self):
+        for i in reversed(range(self._layout.count())):
+            item = self._layout.takeAt(i).widget()
+            if item:
+                item.setParent(None)
 
 class Panel(base.TFrame):
     def __init__(self, app, parent=None):
@@ -133,6 +129,10 @@ class Panel_Container(base.TScrollArea):
             self.setMaximumWidth(width)
         self.setup_ui()
 
+    def resize(self, width):
+        self.setMinimumWidth(width)
+        self.setMaximumWidth(width)
+
     def set_theme_style(self):
         theme = self._app.theme_manager.current_theme
         style_str = '''
@@ -150,6 +150,52 @@ class Panel_Container(base.TScrollArea):
         self._layout.setSpacing(0)
 
 
+class Metering(base.TDialog):
+    def __init__(self, app, parent=None):
+        super(Metering, self).__init__(parent)
+        self._app = app
+        self._layout = QVBoxLayout()
+        self._box = QHBoxLayout()
+        self._vbox = QHBoxLayout()
+        self.item_value = None
+        self._tip_label = base.TLabel(u'请输入数量', self)
+        self._input = components.Input(self._app)
+        self.ok_btn = base.TLButton(self._app, u'提交', size=12)
+        self.setup_ui()
+        self._input.returnPressed.connect(self.ok_btn.clicked)
+
+
+    def setup_ui(self):
+        self.resize(250, 100)
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._layout.setSpacing(0)
+        self._box.addStretch(1)
+        self._box.addSpacing(40)
+        self._box.addWidget(self._tip_label)
+        self._box.addSpacing(10)
+        self._box.addWidget(self._input)
+        self._box.addSpacing(40)
+        self._vbox.addStretch(1)
+        self._vbox.addWidget(self.ok_btn)
+        self._vbox.addSpacing(30)
+
+        self._layout.addSpacing(30)
+        self._layout.addLayout(self._box)
+        self._layout.addLayout(self._vbox)
+        self.setLayout(self._layout)
+
+    def set_inventory(self, inventory_id):
+        self.item_value = inventory_id
+
+    def reset(self):
+        self._input.setText('')
+
+    def hideEvent(self, event):
+        self.reset()
+
+    def closeEvent(self, event):
+        self.reset()
+
 class PayUi(base.TDialog):
     def __init__(self, app, parent=None):
         super(PayUi, self).__init__(parent)
@@ -158,16 +204,24 @@ class PayUi(base.TDialog):
         self._box = QHBoxLayout()
         self._layout = QVBoxLayout(self)
 
+        self.biling_btn = base.TLButton(self._app, u'结账', size=20)
+        self.overview_label = base.TLabel(self._app)
+
         self.top_panel = TopPanel(app, self)
         self.category_panel = Panel_Container(app, self, 160)
-        self.inventory_panel = Panel_Container(app, self, 300)
+        self.inventory_panel = Panel_Container(app, self, 400)
         self.bil_Panel = Panel_Container(app, self)
+        self.metering_dialog = Metering(self._app)
 
         self.set_theme_style()
         self.setup_ui()
 
+    def resizeEvent(self, event):
+        width = self.width() - 210
+        self.inventory_panel.resize(width//2)
+
     def setup_ui(self):
-        self.resize(800, 600)
+        self.resize(1050, 600)
         self._box.setContentsMargins(0, 0, 0, 0)
         self._box.setSpacing(0)
         self._layout.setContentsMargins(0, 0, 0, 0)
@@ -177,6 +231,8 @@ class PayUi(base.TDialog):
         self._box.addWidget(self.bil_Panel)
         self._layout.addWidget(self.top_panel)
         self._layout.addLayout(self._box)
+        self.top_panel.add_item(self.biling_btn, last=True)
+        self.top_panel.add_item(self.overview_label)
 
     def set_theme_style(self):
         theme = self._app.theme_manager.current_theme 

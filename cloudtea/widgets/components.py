@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor, QFont, QPalette
 
 from cloudtea.db import api
 from cloudtea.utils import darker
-from cloudtea.widgets import base, pay
+from cloudtea.widgets import base
 
 
 class ModalHeader(base.TFrame):

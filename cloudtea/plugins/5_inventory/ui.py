@@ -87,7 +87,7 @@ class InventoryDialog(base.TDialog):
         self.meter.addItem(u'散装')
         self.meter.addItem(u'袋/瓶装')
         self.price = components.Input(self, u'售价, 单位: 元')
-        self.suttle = components.Input(self, u'单品净含量, X袋或X克')
+        self.suttle = components.Input(self, u'可分几次使用, 例如: 10袋/盒,每次最少用1袋,即可分10次使用')
 
         self.ok_btn = base.TLButton(self._app, u'提交', size=19)
 
@@ -98,7 +98,7 @@ class InventoryDialog(base.TDialog):
         self.setup_ui()
 
     def set_theme_style(self):
-        theme = self._app.theme_manager.current_theme 
+        theme = self._app.theme_manager.current_theme
         style_str = '''
             #{0} {{ 
                 background: {1}; 
@@ -176,7 +176,7 @@ class InventoryTable(base.TTableWidget):
         self.setColumnWidth(2, 170)
         self.setColumnWidth(5, 170)
 
-        self.setHorizontalHeaderLabels(['', u'品名', u'库存', u'价格', u'规格', u'所属类别', u'单品含量'])
+        self.setHorizontalHeaderLabels(['', u'品名', u'库存', u'价格', u'规格', u'所属类别', u'单品最多消费次数'])
         self.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -242,7 +242,7 @@ class InventoryTable(base.TTableWidget):
         specifications = QTableWidgetItem('%s' % model_data.specifications)
         price = QTableWidgetItem(u'%s 元' % model_data.price)
         category = QTableWidgetItem('%s' % model_data.category.name)
-        suttle = QTableWidgetItem('%s %s' % (model_data.suttle, model_data.meter_display))
+        suttle = QTableWidgetItem('%s' % (model_data.suttle))
 
         row = self.rowCount()
         self.setRowCount(row+1)
